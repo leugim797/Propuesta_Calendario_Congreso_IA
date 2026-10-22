@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Agenda interactiva de los días 27 y 28 de octubre del IV Congreso de Inteligencia Artificial de Andalucía. Propuesta de rediseño no oficial.">
+<meta name="color-scheme" content="light">
+<title>Agenda Congreso IA Andalucía</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;500;600;700;800&display=swap">
+<style>
+/* Estilo tomado de la web del congreso: degradado verde azulado a azul noche, texto oscuro sobre blanco, botones amarillos. Layout: cabecera + (rejilla por hora con una columna por sala | panel "Mi agenda" fijo a la derecha). En móvil las columnas pasan a una lista por hora. */
+:root {
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --ink: #0D1515;
+  --muted: #455858;
+  --line: #C9D8D8;
+  --band: #E3ECEC;
+  --accent: #007078;
+  --accent-soft: #DCF0F0;
+  --on-accent: #FFFFFF;
+  --yellow: #FFC700;
+  --on-yellow: #0D1515;
+  --hero-a: #007078;
+  --hero-b: #000022;
+  --cyan: #35E0D2;
+  --warn: #8A4300;
+  --warn-soft: #FBEBD2;
+  --r-F: #C2410C;
+  --r-A1: #0E7490;
+  --r-A2: #1D4ED8;
+  --r-A3: #7E22CE;
+  --r-MT: #A16207;
+  --font-display: 'Funnel Display', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Funnel Display', 'Segoe UI', system-ui, sans-serif;
+}
+/* Diseño de un solo tema, siempre claro, para que el horario tenga fondo blanco también con el sistema en modo oscuro. */
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.45;
+  padding-block: 0;
+}
+.gut { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.hero { background: linear-gradient(0deg, var(--hero-b) 33%, var(--hero-a) 100%); color: #FFFFFF; padding-block: 36px 44px; }
+.hero-in { max-width: 1320px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+.eyebrow { font-size: 13px; letter-spacing: .09em; text-transform: uppercase; color: var(--cyan); font-weight: 600; }
+h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: clamp(2.2rem, 6vw, 3.6rem); line-height: 1.04; text-wrap: balance; max-width: 18ch; }
+.hero p { margin: 0; max-width: 62ch; font-size: 1.05rem; color: #E3ECEC; }
+.hero a { color: var(--yellow); }
+.credit { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; align-self: flex-start; margin-top: 4px; padding: 8px 14px; border: 1px solid rgba(53,224,210,.55); border-radius: 5px; font-size: 14px; color: #FFFFFF; }
+.credit b { color: var(--cyan); font-weight: 700; }
+.wrap { max-width: 1320px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; padding-block: 28px 40px; }
+.note a { color: var(--accent); }
+footer { background: var(--hero-b); color: #E3ECEC; padding-block: 24px max(24px, env(safe-area-inset-bottom, 0px)); font-size: 14px; }
+footer .hero-in { gap: 6px; }
+footer b { color: var(--cyan); }
+footer a { color: var(--yellow); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.tabs { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; }
+.tab {
+  flex: 1 1 260px; display: flex; align-items: center; justify-content: space-between; text-align: left; cursor: pointer;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; color: #FFFFFF; border: 0; border-radius: 10px; padding: 14px 20px;
+  background: linear-gradient(90deg, var(--hero-a) 65%, var(--hero-b) 100%); opacity: .72;
+}
+.tab::after { content: ""; width: 9px; height: 9px; border-right: 3px solid var(--yellow); border-bottom: 3px solid var(--yellow); transform: rotate(-45deg); margin-right: 4px; }
+.tab[aria-pressed="true"] { opacity: 1; }
+.tab[aria-pressed="true"]::after { transform: rotate(45deg); }
+.tab:hover { opacity: 1; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { position: relative; }
+.chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.chip > span {
+  display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface); font-size: 13.5px; color: var(--muted);
+}
+.chip input:checked + span { color: var(--ink); border-color: var(--accent); background: var(--surface); }
+.chip input:focus-visible + span, .tab:focus-visible, .card:focus-visible, .btn:focus-visible, .rm:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
+.only { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); cursor: pointer; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (min-width: 1180px) { .layout { grid-template-columns: minmax(0, 1fr) 300px; } aside { position: sticky; top: 16px; } }
+
+.colhead, .row { display: grid; grid-template-columns: 56px repeat(var(--cols, 4), minmax(0, 1fr)); gap: 8px; }
+.colhead { padding-bottom: 10px; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; line-height: 1.2; }
+.pin { flex: none; width: 17px; height: 17px; color: var(--ink); }
+.colhead div { display: flex; align-items: center; gap: 7px; }
+.row { padding-block: 8px; border-top: 1px solid var(--band); }
+.row:first-child { border-top: 0; }
+.time { font-weight: 700; font-variant-numeric: tabular-nums; padding-top: 18px; color: var(--accent); }
+.band { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 12px; background: linear-gradient(90deg, var(--hero-a) 65%, var(--hero-b) 100%); color: #FFFFFF; border-radius: 10px; padding: 10px 16px; font-size: 14px; font-weight: 600; }
+.band b { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--yellow); }
+.cell:empty { display: block; }
+
+.card {
+  display: flex; flex-direction: column; gap: 10px; width: 100%; height: 100%; text-align: left; cursor: pointer;
+  font: inherit; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 18px 16px;
+}
+.card:hover { border-color: var(--accent); }
+.card.on { background: var(--accent-soft); border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.card.clash { border: 1px dashed var(--warn); box-shadow: 0 0 0 1px var(--warn); }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 15.5px; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+.clk { width: 16px; height: 16px; flex: none; }
+.roomname { display: none; color: var(--ink); font-weight: 600; }
+.kind { margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--ink); background: var(--band); border-radius: 999px; padding: 3px 9px; }
+.card.on .kind { background: var(--surface); }
+.title { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; line-height: 1.2; color: var(--accent); text-wrap: pretty; overflow-wrap: anywhere; }
+.who { font-size: 14px; color: var(--ink); overflow-wrap: anywhere; }
+.who i { color: var(--muted); }
+.desc { font-size: 14px; color: var(--ink); overflow-wrap: anywhere; }
+.dur { font-size: 14px; color: var(--ink); }
+.flag { align-self: flex-start; font-size: 12.5px; font-weight: 700; color: var(--warn); background: var(--warn-soft); padding: 4px 8px; border-radius: 5px; }
+.act { margin-top: auto; align-self: flex-start; font-size: 13.5px; font-weight: 700; color: var(--accent); padding-top: 4px; }
+.card.on .act { background: var(--yellow); color: var(--on-yellow); border-radius: 5px; padding: 5px 10px; }
+
+.empty { padding: 28px 12px; color: var(--muted); border-top: 1px solid var(--line); }
+
+h2 { margin: 0; font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; color: var(--accent); }
+.mt { margin-top: 28px; display: flex; flex-direction: column; gap: 12px; padding-top: 16px; border-top: 3px solid var(--accent); }
+.mt p { margin: 0; color: var(--muted); max-width: 75ch; }
+.mtgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.note { margin-top: 16px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; max-width: 75ch; }
+
+aside { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--accent); border-radius: 5px; padding: 16px; display: flex; flex-direction: column; gap: 12px; max-height: calc(100vh - 32px); overflow: auto; }
+aside h2 { font-size: 1.1rem; }
+.sum { font-size: 13px; color: var(--muted); }
+.agday { display: flex; flex-direction: column; gap: 8px; }
+.agday h3 { margin: 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.ag { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 8px; align-items: start; font-size: 13.5px; }
+.ag time { font-weight: 700; font-variant-numeric: tabular-nums; }
+.ag .t { font-weight: 700; overflow-wrap: anywhere; }
+.ag .r { color: var(--muted); font-size: 12.5px; }
+.ag .flag { display: inline-block; margin-top: 3px; }
+.rm { font: inherit; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 2px 6px; border-radius: 4px; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { font: inherit; font-weight: 700; font-size: 13px; padding: 8px 12px; border-radius: 6px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.btn { border-radius: 5px; }
+.btn.primary { background: var(--yellow); border-color: var(--yellow); color: var(--on-yellow); }
+#copybox { width: 100%; min-height: 120px; font: 12px/1.4 ui-monospace, monospace; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 8px; }
+
+@media (max-width: 760px) {
+  .colhead { display: none; }
+  .row { display: block; }
+  .time { padding: 2px 0 6px; font-size: 16px; }
+  .cell:empty { display: none; }
+  .cell + .cell { margin-top: 8px; }
+  .roomname { display: inline; }
+  .kind { margin-left: 0; }
+}
+@media (prefers-reduced-motion: no-preference) { .card { transition: border-color .15s, background-color .15s; } }
+</style>
+<style>[hidden] { display: none !important; } img { max-width: 100%; }</style>
+</head>
+<body>
+
+<header class="hero gut">
+  <div class="hero-in">
+    <div class="eyebrow">IV Congreso de Inteligencia Artificial de Andalucía · Granada</div>
+    <h1>Programa del 27 y 28 de octubre</h1>
+    <p>Elige las sesiones que quieres ver y deja que la agenda te avise cuando dos coinciden en hora. Tus elecciones se guardan en este navegador.</p>
+    <div class="credit"><span>Propuesta de rediseño no oficial.</span><span>Hecho con Claude, orquestado por <b>Miguel Ángel Herrera Serrano</b></span></div>
+  </div>
+</header>
+
+<div class="wrap gut">
+  <div class="controls">
+    <div class="tabs" role="group" aria-label="Día">
+      <button class="tab" type="button" data-day="27" aria-pressed="true">Martes 27</button>
+      <button class="tab" type="button" data-day="28" aria-pressed="false">Miércoles 28</button>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Salas"></div>
+    <label class="only"><input type="checkbox" id="only"> Solo mi selección</label>
+  </div>
+
+  <div class="layout">
+    <main>
+      <div class="colhead" id="colhead"></div>
+      <div id="grid"></div>
+      <section class="mt" id="mt"></section>
+      <div id="extra"></div>
+    </main>
+    <aside aria-label="Mi agenda">
+      <h2>Mi agenda</h2>
+      <div class="sum" id="sum"></div>
+      <div id="agenda"></div>
+      <div class="btns">
+        <button class="btn primary" type="button" id="copy">Copiar agenda</button>
+        <button class="btn" type="button" id="clear">Vaciar</button>
+      </div>
+      <textarea id="copybox" readonly hidden aria-label="Agenda en texto"></textarea>
+    </aside>
+  </div>
+</div>
+
+<footer class="gut">
+  <div class="hero-in">
+    <div>Hecho con Claude, orquestado por <b>Miguel Ángel Herrera Serrano</b>, estudiante de Desarrollo de Aplicaciones Web.</div>
+    <div>Proyecto de clase y no oficial. Datos del <a href="https://www.juntadeandalucia.es/congresoIA/programa/" target="_blank" rel="noopener">programa oficial</a> consultado el 20 de octubre de 2026. Si algo cambia allí, prevalece el programa oficial.</div>
+  </div>
+</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const tm = s => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
+const fm = n => String(Math.floor(n / 60)).padStart(2, '0') + ':' + String(n % 60).padStart(2, '0');
+
+const ROOMS = { F: 'Manuel de Falla', A1: 'Andalucía I', A2: 'Andalucía II', A3: 'Andalucía III' };
+const KEYS = Object.keys(ROOMS);
+const DAYS = { 27: 'Martes 27', 28: 'Miércoles 28' };
+const BREAKS = {
+  27: [{ s: '09:00', m: 30, t: 'Café networking' }, { s: '14:00', m: 90, t: 'Pausa para el almuerzo' }],
+  28: [{ s: '11:00', m: 30, t: 'Café networking' }]
+};
+
+const SS = [];
+const add = (d, r, s, m, k, t, p, x) => SS.push({ id: d + '-' + r + '-' + s.replace(':', ''), d, r, s, st: tm(s), m, k, t, p, x: x || '' });
+
+/* Martes 27 · Manuel de Falla */
+add(27, 'F', '09:30', 40, 'Ponencia', 'Metamorfosis (ponencia de inauguración)', 'Pilar Manchón Portillo · Google AI');
+add(27, 'F', '10:15', 40, 'Acto', 'Inauguración institucional', 'José Antonio Nieto Ballesteros (Junta de Andalucía) y Marifrán Carazo Villalonga (Ayuntamiento de Granada)');
+add(27, 'F', '12:00', 40, 'Ponencia', 'Matemáticas para salvar el mundo', 'Clara Grima Ruiz · Universidad de Sevilla');
+add(27, 'F', '12:50', 60, 'Mesa', 'EUNOMIA.AI: Building European Public AI', 'Modera Manuel Escobar Montes (Agencia Digital de Andalucía). Con GRNET, NASK, UGR, KISC y Uni Graz.');
+add(27, 'F', '15:30', 25, 'Ponencia', 'La revolución no es la IA, eres tú', 'Patricia Leal Freire y Jorge Martos Pardo · Minsait');
+add(27, 'F', '16:05', 40, 'Mesa', 'Mesa de WomanDigital', 'Modera María Luisa Ulgar Gutérrez. Con Pilar Manchón Portillo y Gloria Álvarez Benito.');
+add(27, 'F', '16:55', 25, 'Ponencia', 'Cuando la IA toma el control: agentes inteligentes en acción', 'Olivier Perard · Oracle');
+add(27, 'F', '17:25', 50, 'Mesa', 'La revolución de la IA en el sector telco', 'Modera Sergio Gómez Rojas (Sandetel). Con Vodafone, Orange, Telefónica y T-Systems.');
+/* Martes 27 · Andalucía I */
+add(27, 'A1', '12:00', 25, 'Ponencia', 'Cómo abordar la componente humana en la era agéntica de la IA', 'Julio César Gómez Martín · Dell Technologies');
+add(27, 'A1', '12:35', 30, 'Ponencia', 'Guías para una IA segura', 'María Concepción Labao Moreno (Diputación de Málaga) y Enrique Rando González (Agencia Digital de Andalucía)');
+add(27, 'A1', '13:15', 25, 'Ponencia', 'Monaka: el camino hacia una IA soberana sostenible', 'Juan Antonio García Carrasco · Fujitsu');
+add(27, 'A1', '16:00', 25, 'Ponencia', 'Desarrollar software con IA de forma gobernada en la Agencia Digital de Andalucía', 'Manuel Rodríguez Sáez (Agencia Digital de Andalucía) y Daniel Martínez Sevilla (NTT Data)');
+add(27, 'A1', '16:30', 120, 'Acto', 'Misión Startups', 'Open Innovation Gates');
+/* Martes 27 · Andalucía II */
+add(27, 'A2', '12:00', 40, 'Mesa', 'From AI Factories to Gigafactories: la infraestructura de IA soberana de Europa', 'Modera María José Escalona (Universidad de Sevilla). Con Telefónica, GMV y GRNET.');
+add(27, 'A2', '12:50', 40, 'Mesa', 'De copilotos a agentes: ¿está preparada la Administración para delegar tareas a la IA?', 'Modera Juan Luis Ceada (Ayuntamiento de Sevilla). Con Salesforce, Devoteam y Guadaltel.');
+add(27, 'A2', '15:30', 60, 'Ponencia', 'Videojuegos: un campo apasionante para la Inteligencia Artificial', 'Pablo García Sánchez · Universidad de Granada');
+add(27, 'A2', '16:30', 90, 'Taller', 'Evolución y mejora de producto con IA', 'Alberto Donaire Ávila y Javier Sacristán Fresneda · ColoquIALab',
+  'Taller práctico y gamificado en equipos multidisciplinares, con tablero y cartas de capacidades de IA, riesgos, recursos e interfaces. Nivel técnico: ninguno.');
+/* Martes 27 · Andalucía III */
+add(27, 'A3', '12:00', 25, 'Ponencia', 'Sin contexto no hay escala: datos, semántica y control para una IA confiable', 'Carlos Rodríguez Abellán · DXC');
+add(27, 'A3', '12:35', 25, 'Ponencia', 'Implementación segura de IA: del diseño a producción', 'David Galdrán Álvarez · Check Point');
+add(27, 'A3', '13:10', 40, 'Mesa', 'IA y computación cuántica: el salto hacia una nueva frontera tecnológica', 'Modera Francisco Luis Benítez (Fidesol). Con Safran, Ayesa y Cenit.');
+add(27, 'A3', '15:30', 40, 'Mesa', 'From Lab to Market: The eDIH\'s Journey', 'EY, Fundación AI Granada (eDIH AirAndalusia) y eDIH CIDIHUB');
+add(27, 'A3', '16:20', 40, 'Mesa', '¿De dónde saldrá el sénior de 2032?', 'Modera Manuel Muñoz Megías (Cívica). Con Babel, Grupo Solutia y Tadia.');
+add(27, 'A3', '17:10', 25, 'Ponencia', 'Transformación de los roles de la ingeniería de software: desarrollo basado en especificaciones', 'José Chamorro · Accenture');
+add(27, 'A3', '17:40', 25, 'Ponencia', 'Cómo profesionalizar el uso de la IA: plataforma de ejecución agéntica de procesos', 'Esteban Morillo Baro · Servinform');
+
+/* Miércoles 28 · Manuel de Falla */
+add(28, 'F', '09:00', 25, 'Ponencia', 'La era de la seguridad agéntica: defendiendo a velocidad de máquina', 'José Antonio Lorenzo · Palo Alto Networks');
+add(28, 'F', '09:30', 40, 'Mesa', 'Proyecto europeo AICONFORM: de la norma al código, IA para automatizar el cumplimiento regulatorio', 'Con el Ministerio de Gobernanza Digital de Grecia, CARSA y Sandetel.');
+add(28, 'F', '10:20', 40, 'Mesa', 'La cultura ante la Inteligencia Artificial: hacia unos criterios compartidos desde Granada 2031', '');
+add(28, 'F', '11:30', 40, 'Mesa', 'De experimentar a transformar: el reto de desplegar IA en la administración pública', 'Modera Manuel Perera Domínguez (Agencia Digital de Andalucía). Con Accenture, Ayesa y NTT Data.');
+add(28, 'F', '12:20', 40, 'Mesa', 'Alhambra Living Lab y el futuro de los gemelos digitales para el patrimonio de Andalucía', 'Modera Rafael Mata Sánchez. Con el Patronato de la Alhambra y el Generalife, la Consejería de Cultura y la Catedral de Córdoba.');
+add(28, 'F', '13:10', 30, 'Acto', 'Entrega de Premios Sopra Steria TFG-TFM', 'Entrega Manuel Perera Domínguez (Agencia Digital de Andalucía)');
+add(28, 'F', '13:50', 30, 'Acto', 'Ponencia y grabación de podcast: Monos estocásticos', '');
+/* Miércoles 28 · Andalucía I */
+add(28, 'A1', '09:00', 30, 'Mesa', 'Justicia, mediación y derechos humanos en la sociedad digital: ¿podemos hacer mejor justicia con la IA?', 'Verónica Quirós Blanco (jueza) y Eva María Ávila Becerra (mediación)');
+add(28, 'A1', '09:35', 25, 'Mesa', 'Desinformación', 'Modera Fernando Trujillo (UGR). Con Leticia Rodríguez Fernández y María Teresa Martín Valdivia.');
+add(28, 'A1', '10:10', 25, 'Ponencia', 'IA neuro-simbólica: sistemas conversacionales', 'José Quesada · Lekta AI');
+add(28, 'A1', '10:35', 25, 'Ponencia', 'Nexyro Agents: hacia un gobierno unificado de la IA', 'Miguel Ángel Núñez Sabín y Ramón Serrano Valero · Sopra Steria');
+add(28, 'A1', '11:30', 20, 'Ponencia', 'IA: Inteligencia Aumentada. De la inteligencia artificial a la inteligencia aplicada', 'Ramón González Sánchez · Mentomy');
+add(28, 'A1', '12:00', 20, 'Ponencia', 'Chat vs agentes de IA: cómo convertir la IA en valor real para las empresas', 'Joaquín Peña Siles · People1.ai y Universidad de Sevilla');
+add(28, 'A1', '12:30', 40, 'Mesa', 'La Administración inteligente: el impacto de la IA en el sector público', 'Modera Rosa María Torres de Paz (Soltel). Con Esri España, Lenovo y Gecor System.');
+add(28, 'A1', '13:20', 35, 'Mesa', '¿Cómo compraremos tecnología en la Administración del futuro?', 'Modera Rafael Pastor Sáenz (Servicio Andaluz de Salud). Con la Agencia Digital de Andalucía, el Ayuntamiento de Granada y Sandetel.');
+/* Miércoles 28 · Andalucía II */
+add(28, 'A2', '09:00', 30, 'Mesa', 'Del formulario al agente: cómo la IA agéntica reinventa el acceso a los servicios públicos', 'Modera Nacho Cortés Santos (Agencia Digital de Andalucía). Con NTT Data y Salesforce.');
+add(28, 'A2', '10:10', 40, 'Mesa', 'Agentes IA en acción: casos reales y transformación empresarial', 'Modera Héctor Gómez Loizaga (Solutia). Con Eureca y Future Space.');
+add(28, 'A2', '11:30', 35, 'Mesa', 'Quantum ADA', 'Modera José Luis López (ANIA). Con Daniel Manzano (UGR) y OnTech Innovation.');
+add(28, 'A2', '12:15', 40, 'Mesa', 'Del hype a la realidad: protegerse en la era de la IA', 'Modera Eloy Sanz (Agencia Digital de Andalucía). Con Palo Alto, Innovasur y PwC.');
+add(28, 'A2', '13:40', 40, 'Mesa', 'Gobernanza e inteligencia operacional para el sector público', 'Modera María Dolores Moyano (Agencia Digital de Andalucía). Con Alten, Fujitsu y T-Systems.');
+/* Miércoles 28 · Andalucía III */
+add(28, 'A3', '09:00', 25, 'Ponencia', 'Secure and Sovereign AI Agents: riesgos, contención e infraestructura propia bajo control humano', 'Thomas Endres · TNG Technology Consulting');
+add(28, 'A3', '09:35', 25, 'Ponencia', 'La nueva era de las soluciones de IA en el edge', 'Fernando Alcázar Santos · HP');
+add(28, 'A3', '10:10', 45, 'Mesa', 'Más allá de la automatización: aplicación de IA para transformar procesos', 'Modera Alejandro Martínez Marcos (Agencia Digital de Andalucía). Con UiPath, Atos y Minsait.');
+add(28, 'A3', '11:30', 25, 'Mesa', 'Gobierno de la decisión: cómo gobernar las decisiones de la IA, no solo sus datos', 'Modera Diego González (T-Systems). Con la Agencia Digital de Andalucía y Turismo de Andalucía.');
+add(28, 'A3', '12:05', 45, 'Mesa', '¿Dónde vive la IA? Centros de datos, energía y territorio', 'Modera Roberto Álvarez (Industry Office). Con Cuerva Energía, CT Engineering Group, Trevenque y Alto Infrastructure.');
+add(28, 'A3', '13:00', 30, 'Ponencia', 'IA en los procesos de valoración de la discapacidad', 'Carlos Baena Parrado · Agencia Digital de Andalucía');
+add(28, 'A3', '13:35', 40, 'Mesa', 'IA al servicio de las personas: transformando vidas', 'Modera Eduardo Haro Amate (Nazaries). Con Montevive AI, SIDN e Internal·IA.');
+
+/* Mesas tecnológicas: sesión que se repite cada 30 minutos dentro de la franja */
+const MT = [
+  { t: 'De boceto a mano alzada a prototipo interactivo con IA (Granada Capital Cultural 2031)', p: 'Adrián Rivas · Desarrollador web', x: 'Taller visual: de un esquema dibujado en papel a una interfaz web funcional, con cámara, modelos multimodales y generación de código.', pub: 'Perfiles no técnicos con ideas de negocio y empresas', niv: 'Inicial / sin código' },
+  { t: 'Modificación y creación de módulos para Odoo con OpenCode', p: 'Nacho Cabrero · Vértigo Apps', x: 'Caso práctico con el ERP Odoo: cómo modificar o crear módulos a medida con ayuda de IA.', pub: 'Desarrolladores Python/Odoo, consultores ERP, soporte y empresarios', niv: 'Inicial' },
+  { t: 'NotebookLM: tu centro de investigación e informes con IA', p: 'Daniel Romero · Desarrollador web', x: 'Cargar tus propias fuentes (PDF, normativas), hacer consultas cruzadas y generar resúmenes, cronologías y audios explicativos.', pub: 'Perfiles no técnicos con ideas de negocio y empresas', niv: 'Inicial / usuario' },
+  { t: 'Automatización de tareas para pequeñas empresas y comercios', p: 'Alumnado del I.E.S. P. Hermenegildo Lanz', x: 'Sesión «no-code» para resolver cuellos de botella en pequeños negocios, con pautas de privacidad y tratamiento de datos de clientes.', pub: 'Empresas con ganas de integrar la IA', niv: 'Inicial / sin código' },
+  { t: 'Taller práctico de diseño asistido: Claude Design (Granada Cultura 2031)', p: 'Marina Muñoz Cano · Aircury', x: 'Generar maquetas interactivas a partir de lenguaje natural y ajustar estilos, colores y adaptación a móvil.', pub: 'Perfiles no técnicos con ideas de negocio y empresas', niv: 'Inicial / medio' }
+];
+const MTWIN = { 27: ['12:00 a 14:00', '16:30 a 18:30'], 28: ['09:30 a 14:00'] };
+
+const byId = {};
+SS.forEach(x => { byId[x.id] = x; });
+[27, 28].forEach(d => MT.forEach((m, i) => { byId[d + '-mt' + (i + 1)] = { id: d + '-mt' + (i + 1), d, mt: true, t: m.t, p: m.p, x: m.x, pub: m.pub, niv: m.niv }; }));
+
+const KEY = 'agenda-congresoia-2026';
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || '[]').filter(id => byId[id]); } catch (e) { return []; } };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify([...sel])); } catch (e) {} };
+
+let day = location.hash === '#dia28' ? 28 : 27;
+let only = false;
+const vis = { F: true, A1: true, A2: true, A3: true };
+const sel = new Set(load());
+
+const overlap = (a, b) => a.d === b.d && a.st < b.st + b.m && b.st < a.st + a.m;
+const conflicts = x => [...sel].map(id => byId[id]).filter(y => y && !y.mt && !x.mt && y.id !== x.id && overlap(x, y));
+const short = t => t.length > 46 ? t.slice(0, 44).trim() + '…' : t;
+const range = x => fm(x.st) + '–' + fm(x.st + x.m);
+
+const CLK = '<svg class="clk" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 4.2V8.2l2.7 1.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+const PIN = '<svg class="pin" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5a4.7 4.7 0 0 0-4.7 4.7C3.3 9.6 8 14.5 8 14.5s4.7-4.9 4.7-8.3A4.7 4.7 0 0 0 8 1.5Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="6.2" r="1.7" fill="currentColor"/></svg>';
+const who = p => { if (!p) return ''; const k = p.indexOf(' · '); return '<span class="who">' + (k > 0 ? '<b>' + esc(p.slice(0, k)) + '</b> | <i>' + esc(p.slice(k + 3)) + '</i>' : esc(p)) + '</span>'; };
+
+function cardHTML(x) {
+  const on = sel.has(x.id), cf = conflicts(x);
+  let flag = '';
+  if (cf.length) {
+    flag = on
+      ? '<span class="flag">Coincide con «' + esc(short(cf[0].t)) + '»' + (cf.length > 1 ? ' y ' + (cf.length - 1) + ' más' : '') + '</span>'
+      : '<span class="flag">Coincide en hora con tu selección</span>';
+  }
+  return '<button type="button" class="card' + (on ? ' on' : '') + (cf.length && !on ? ' clash' : '') + '" data-id="' + x.id + '" aria-pressed="' + on + '">' +
+    '<span class="meta"><span class="dot" style="--c:var(--r-' + x.r + ')"></span>' + CLK + '<span>' + fm(x.st) + ' – ' + fm(x.st + x.m) + '</span><span class="roomname">· ' + ROOMS[x.r] + '</span><span class="kind">' + x.k + '</span></span>' +
+    '<span class="title">' + esc(x.t) + '</span>' +
+    who(x.p) +
+    (x.x ? '<span class="desc">' + esc(x.x) + '</span>' : '') +
+    '<span class="dur">Duración: ' + x.m + '′</span>' +
+    flag +
+    '<span class="act">' + (on ? '✓ En mi agenda' : '+ Añadir a mi agenda') + '</span></button>';
+}
+
+function mtCardHTML(id) {
+  const x = byId[id], on = sel.has(id);
+  return '<button type="button" class="card' + (on ? ' on' : '') + '" data-id="' + id + '" aria-pressed="' + on + '">' +
+    '<span class="meta"><span class="dot" style="--c:var(--r-MT)"></span>' + CLK + '<span>Cada 30 min</span><span class="kind">Taller</span></span>' +
+    '<span class="title">' + esc(x.t) + '</span>' + who(x.p) + '<span class="desc">' + esc(x.x) + '</span>' +
+    '<span class="dur">Público: ' + esc(x.pub) + '. Nivel: ' + esc(x.niv) + '.</span>' +
+    '<span class="act">' + (on ? '✓ En mi agenda' : '+ Añadir a mi agenda') + '</span></button>';
+}
+
+function renderGrid() {
+  const cols = KEYS.filter(r => vis[r]);
+  $('#colhead').style.setProperty('--cols', cols.length || 1);
+  $('#colhead').innerHTML = '<div></div>' + cols.map(r => '<div><span class="dot" style="--c:var(--r-' + r + ')"></span>' + PIN + 'Sala ' + ROOMS[r] + '</div>').join('');
+  const list = SS.filter(x => x.d === day && vis[x.r] && (!only || sel.has(x.id)));
+  let html = '';
+  if (!cols.length) html = '<div class="empty">Activa al menos una sala para ver sus sesiones.</div>';
+  else if (!list.length) html = '<div class="empty">' + (only ? 'Aún no has elegido sesiones este día. Desactiva «Solo mi selección» y pulsa en las que te interesen.' : 'No hay sesiones para esta selección de salas.') + '</div>';
+  else {
+    const times = [...new Set(list.map(x => x.st))].map(t => ({ t, k: 's' }));
+    const brs = only ? [] : BREAKS[day].map(b => ({ t: tm(b.s), k: 'b', b }));
+    const rows = times.concat(brs).sort((a, b) => a.t - b.t || (a.k === 'b' ? -1 : 1));
+    html = rows.map(r => {
+      if (r.k === 'b') return '<div class="row" style="--cols:' + cols.length + '"><div class="band"><span>' + r.b.t + '</span><b>' + fm(r.t) + '–' + fm(r.t + r.b.m) + '</b></div></div>';
+      return '<div class="row" style="--cols:' + cols.length + '"><div class="time">' + fm(r.t) + '</div>' +
+        cols.map(c => '<div class="cell">' + list.filter(x => x.st === r.t && x.r === c).map(cardHTML).join('') + '</div>').join('') + '</div>';
+    }).join('');
+  }
+  $('#grid').innerHTML = html;
+
+  const ids = MT.map((_, i) => day + '-mt' + (i + 1)).filter(id => !only || sel.has(id));
+  $('#mt').hidden = !ids.length;
+  $('#mt').innerHTML = '<h2>Mesas tecnológicas</h2><p>Talleres de entrada libre. Cada uno se repite cada 30 minutos, así que puedes pasar en cualquier momento de la franja: ' + MTWIN[day].join(' y de ') + '. No cuentan como coincidencia con las demás sesiones.</p><div class="mtgrid">' + ids.map(mtCardHTML).join('') + '</div>';
+  $('#extra').innerHTML = day === 28
+    ? '<div class="note"><b>Matchmaking Talento–Empresa</b> (evento de la comunidad). IX edición, presencial, a partir de las 11:00. Entrevistas rápidas de 5 minutos con varias empresas. <a href="https://experienciamatchmaking.com/matchmakings/ixexperienciamatchmakingtech/" target="_blank" rel="noopener">Más información</a></div>'
+    : '';
+}
+
+function agendaData() {
+  const items = [...sel].map(id => byId[id]).filter(Boolean);
+  const out = {};
+  [27, 28].forEach(d => {
+    out[d] = {
+      timed: items.filter(x => x.d === d && !x.mt).sort((a, b) => a.st - b.st || a.r.localeCompare(b.r)),
+      flex: items.filter(x => x.d === d && x.mt)
+    };
+  });
+  return out;
+}
+
+function renderAgenda() {
+  const data = agendaData();
+  let n = 0, clashes = 0;
+  const seen = new Set();
+  let html = '';
+  [27, 28].forEach(d => {
+    const { timed, flex } = data[d];
+    if (!timed.length && !flex.length) return;
+    n += timed.length + flex.length;
+    html += '<div class="agday"><h3>' + DAYS[d] + '</h3>' +
+      timed.map(x => {
+        const cf = conflicts(x);
+        cf.forEach(y => { const k = [x.id, y.id].sort().join('|'); if (!seen.has(k)) { seen.add(k); clashes++; } });
+        return '<div class="ag"><time>' + fm(x.st) + '</time><div><div class="t">' + esc(x.t) + '</div><div class="r">' + fm(x.st) + '–' + fm(x.st + x.m) + ' · ' + ROOMS[x.r] + '</div>' +
+          (cf.length ? '<span class="flag">Coincide con «' + esc(short(cf[0].t)) + '»</span>' : '') + '</div>' +
+          '<button class="rm" type="button" data-rm="' + x.id + '" aria-label="Quitar ' + esc(short(x.t)) + '">×</button></div>';
+      }).join('') +
+      flex.map(x => '<div class="ag"><time>Libre</time><div><div class="t">' + esc(x.t) + '</div><div class="r">Mesa tecnológica · ' + MTWIN[d].join(' y ') + '</div></div>' +
+        '<button class="rm" type="button" data-rm="' + x.id + '" aria-label="Quitar ' + esc(short(x.t)) + '">×</button></div>').join('') + '</div>';
+  });
+  $('#agenda').innerHTML = html || '<div class="sum">Todavía no has elegido nada. Pulsa en cualquier sesión para añadirla aquí.</div>';
+  $('#sum').textContent = n ? n + (n === 1 ? ' sesión elegida' : ' sesiones elegidas') + (clashes ? ' · ' + clashes + (clashes === 1 ? ' coincidencia horaria' : ' coincidencias horarias') : ' · sin coincidencias') : '';
+}
+
+function agendaText() {
+  const data = agendaData();
+  const lines = ['Mi agenda · IV Congreso de IA de Andalucía'];
+  [27, 28].forEach(d => {
+    const { timed, flex } = data[d];
+    if (!timed.length && !flex.length) return;
+    lines.push('', DAYS[d]);
+    timed.forEach(x => lines.push(range(x) + ' · ' + x.t + ' · Sala ' + ROOMS[x.r]));
+    flex.forEach(x => lines.push('Libre (' + MTWIN[d].join(' y ') + ') · Mesa tecnológica: ' + x.t));
+  });
+  return lines.join('\n');
+}
+
+function renderAll() {
+  document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.day === day)));
+  renderGrid();
+  renderAgenda();
+}
+
+$('#chips').innerHTML = KEYS.map(r => '<label class="chip"><input type="checkbox" data-room="' + r + '" checked><span><span class="dot" style="--c:var(--r-' + r + ')"></span>' + ROOMS[r] + '</span></label>').join('');
+
+document.addEventListener('click', e => {
+  const t = e.target;
+  const card = t.closest('[data-id]');
+  if (card) {
+    const id = card.dataset.id;
+    sel.has(id) ? sel.delete(id) : sel.add(id);
+    save(); renderAll();
+    const again = document.querySelector('[data-id="' + id + '"]');
+    if (again) again.focus({ preventScroll: true });
+    return;
+  }
+  const rm = t.closest('[data-rm]');
+  if (rm) { sel.delete(rm.dataset.rm); save(); renderAll(); return; }
+  const tab = t.closest('[data-day]');
+  if (tab) { day = +tab.dataset.day; renderAll(); return; }
+  if (t.closest('#clear')) { sel.clear(); save(); $('#copybox').hidden = true; renderAll(); return; }
+  if (t.closest('#copy')) {
+    const text = agendaText();
+    const box = $('#copybox');
+    const fallback = () => { box.value = text; box.hidden = false; box.focus(); box.select(); };
+    try {
+      navigator.clipboard.writeText(text).then(() => { $('#copy').textContent = 'Copiada'; setTimeout(() => { $('#copy').textContent = 'Copiar agenda'; }, 1500); }, fallback);
+    } catch (err) { fallback(); }
+  }
+});
+document.addEventListener('change', e => {
+  if (e.target.matches('[data-room]')) { vis[e.target.dataset.room] = e.target.checked; renderGrid(); }
+  if (e.target.id === 'only') { only = e.target.checked; renderGrid(); }
+});
+
+renderAll();
+</script>
+</body>
+</html>
